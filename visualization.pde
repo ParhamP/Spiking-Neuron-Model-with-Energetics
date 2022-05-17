@@ -11,10 +11,10 @@ import peasy.*;
 
 PeasyCam cam;
 ArrayList<Neuron> globe;
-float weight = 0.05; // 0.001
+float weight = 0.4; // 0.001 0.05
 float random_array[];
 float time = 0;
-float time_increment = 1.0;
+float time_increment = 8.0;
 float maxDistance;
 float minDistance;
 float num_inhibitory_prob_threhsold = 0.2; //0.2
@@ -23,10 +23,11 @@ float distance_length_connection_prob = 0.65; //0.65
 
 void setup() {
   size(900, 900, P3D); 
+  frameRate(40);
   cam = new PeasyCam(this, 2000);
   cam.rotateX(90);
   float r = 700;
-  int total = 15; // 20
+  int total = 15; // 15
   globe = create_sphere(r, total);
   find_min_max_distance();
   create_connections(globe);
@@ -181,16 +182,20 @@ void draw() {
     }
     draw_spike_locations(current_neuron_spike_locations, is_inhibitory);
   }
+  
 }
 
-//void mousePressed() {
+void mousePressed() {
   
-//  //Neuron n1 = globe.get(0);
-//  //Neuron n2 = globe.get(1);
+  //Neuron n1 = globe.get(0);
+  //Neuron n2 = globe.get(1);
+  //Neuron n3 = globe.get(2);
 
-//  //n1.spike();
+  ////n1.spike();
   
-//  //n1.update_membrane_potential(weight);
-//  //println(n2.V);
-  
-//}
+  ////n1.update_membrane_potential(weight);
+  //println(n1.V);
+  //println(n2.V);
+  //println(n3.V);
+  //println("---------");
+}

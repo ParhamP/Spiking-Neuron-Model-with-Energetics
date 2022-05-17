@@ -2,7 +2,9 @@ class Signal{
   PVector location;
   Neuron source;
   Neuron target;
-  float speed = 0.05;
+  float speed;
+  float signalMinSpeed = 0.0;//0.035
+  float signalMaxSpeed = 0.065; 
   float weight;
   boolean spike_initiated;
   float last_jump_time;
@@ -16,6 +18,7 @@ class Signal{
   }
   
   Signal(Neuron source_neuron, Neuron target_neuron, float neuron_weight) {
+    speed = random(signalMinSpeed, signalMaxSpeed);
     source = source_neuron;
     target = target_neuron;
     weight = neuron_weight;

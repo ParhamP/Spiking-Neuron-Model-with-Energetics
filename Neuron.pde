@@ -3,22 +3,24 @@ class Neuron {
   PVector location;
   //ArrayList<Signal> input_signals = new ArrayList<Signal>();
   ArrayList<Signal> output_signals = new ArrayList<Signal>();
-  float V_R = 0.125-1; // resting membrane potential
+  float V_R = -0.875; // resting membrane potential
   float V = V_R; // current membrane potential
   float V_THETA = 0.60; // firing threshold potential
-  float TAU_V = 0.005; // decay parameter 0.05
-  float REFRACTORY_PERIOD_DURATION = 40; // refactory period time in ms 19
+  float TAU_V = 0.03; // decay parameter 0.05
+  float REFRACTORY_PERIOD_DURATION = 10; // refactory period time in ms 19 40
   boolean in_refractory_period = false;
   float current_time;
   float refractory_time_start;
   ArrayList<PVector> spike_locations;
   boolean is_inhibitory = false;
+  Energy energy_pool;
   
   Neuron() {
   }
   
   Neuron(float x, float y, float z) {
     set_location(x, y, z);
+    energy_pool = new Energy(this);
   }
   
   void set_location(float x, float y, float z) {
@@ -36,16 +38,12 @@ class Neuron {
   void connect_to(Neuron output, float weight) {
     Signal output_signal = new Signal(this, output, weight);
     output_signals.add(output_signal);
-    //output.add_input(this, weight);
   }
   
   ArrayList<Signal> get_output_signals() {
     return output_signals;
   }
   
-  //  ArrayList<Signal> get_input_signals() {
-  //  return input_signals;
-  //}
   
    void set_as_inhibitory() {
     is_inhibitory = true;
@@ -60,18 +58,13 @@ class Neuron {
   }
   
   
-  //void add_input(Neuron input, float weight) {
-  //  Signal input_signal = new Signal(input, this, weight);
-  //  input_signals.add(input_signal);
-  //}
   
   void decay_membrane_potential() {
     if (in_refractory_period) {
       return;
     }
-    float tau_v = random(0.0001, 0.005);
-    V = V + tau_v;
-    //println(V);
+    //float tau_v = random(0.00005, 0.05);
+    V = V + TAU_V;
   }
   
   void reset_membrane_potential() {
@@ -79,15 +72,13 @@ class Neuron {
   }
   
   void update_membrane_potential(float weight) {
-    //println(V);
-    //println("hi");
     if (in_refractory_period) {
       return;
     }
     V = V + weight;
-    //println(weight);
-    //println(V);
-    //println("--------");
+    if (V >= V_THETA) {
+      //println(current_time);
+    }
   }
   
   void enter_refractory_period() {
@@ -97,14 +88,14 @@ class Neuron {
   
   void update(float time) {
     current_time = time;
+    energy_pool.replenish(current_time);
     spike_locations = new ArrayList<PVector>();
-    if (current_time > refractory_time_start + REFRACTORY_PERIOD_DURATION) {
+    if (current_time > (refractory_time_start + REFRACTORY_PERIOD_DURATION)) {
         in_refractory_period = false;
     }
     decay_membrane_potential();
-    if (V > V_THETA) {
+    if (V > V_THETA && energy_pool.has_energy()) {
       spike();
-      reset_membrane_potential();
     }
     for (int s_i = 0; s_i < output_signals.size(); s_i++) {
       Signal current_signal = output_signals.get(s_i);
@@ -119,11 +110,13 @@ class Neuron {
     if (in_refractory_period) {
       return;
     }
+    energy_pool.deplete();
     enter_refractory_period();
     for (int s_i = 0; s_i < output_signals.size(); s_i++) {
       Signal current_signal = output_signals.get(s_i);
       current_signal.initiate_spike();
     }
+    reset_membrane_potential();
   }
   
   @Override
@@ -142,7 +135,6 @@ class Neuron {
     public String toString()
     {
          return get_location().toString();
-         //return "Key: " + key.getKey() + " - Value: " + value.getValue();
     }
     
 }
