@@ -3,7 +3,7 @@ class Signal{
   Neuron source;
   Neuron target;
   float speed;
-  float signalMinSpeed = 0.0;//0.035
+  float signalMinSpeed = 0.0;
   float signalMaxSpeed = 0.065; 
   float weight;
   boolean spike_initiated;
@@ -12,7 +12,7 @@ class Signal{
   PVector spike_location;
   int spike_location_index;
   float current_time;
-  float path_sampling_value = 10; // 10
+  float path_sampling_value = 10;
   
   Signal(){
   }
@@ -63,6 +63,10 @@ class Signal{
     spike_initiated = true;
     last_jump_time = current_time;
     spike_location_index = 0;
+  }
+  
+  boolean is_spiking() {
+    return spike_initiated;
   }
   
   

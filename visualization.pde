@@ -1,25 +1,19 @@
 import peasy.*;
-//import jgrapht.*;
-//package org.jgrapht.generate;
-
-//import org.jgrapht.*;
-//import org.jgrapht.util.*;
-
-//import java.util.*;
 
 // create a small world graph algorithm
 
 PeasyCam cam;
 ArrayList<Neuron> globe;
-float weight = 0.4; // 0.001 0.05
+float weight = 0.4;
 float random_array[];
 float time = 0;
 float time_increment = 8.0;
 float maxDistance;
 float minDistance;
-float num_inhibitory_prob_threhsold = 0.2; //0.2
-float distance_length_connection_prob = 0.65; //0.65
-
+float num_inhibitory_prob_threhsold = 0.2;
+float distance_length_connection_prob = 0.0; // previously 0.65
+ArrayList<Integer> num_spikes_list = new ArrayList<Integer>();
+ArrayList<Float> total_energy_list = new ArrayList<Float>();
 
 void setup() {
   size(900, 900, P3D); 
@@ -31,7 +25,6 @@ void setup() {
   globe = create_sphere(r, total);
   find_min_max_distance();
   create_connections(globe);
-  //WattsStrogatzGraphGenerator(10, 4, 0.2);
 }
 
 ArrayList<Neuron> create_sphere(float r, int total){
@@ -104,6 +97,8 @@ void find_min_max_distance() {
 
 void create_connections(ArrayList<Neuron> globe) {
   int total = globe.size();
+  float max_dist = Float.NEGATIVE_INFINITY;
+  float min_dist = Float.POSITIVE_INFINITY;
   for (int i = 0; i < total; i++) {
     Neuron n1 = globe.get(i);
     PVector v1 = n1.get_location();
@@ -114,6 +109,14 @@ void create_connections(ArrayList<Neuron> globe) {
       if (dist < 1.0) {
         continue;
       }
+      if (dist > 400) {
+        continue;
+      }
+      if (dist < min_dist) {
+        min_dist = dist;
+      } else if (dist > max_dist) {
+        max_dist = dist;
+      }
       float connection_prob = map(dist, minDistance, maxDistance, 1.0, 0.0); //<>//
       if (connection_prob > distance_length_connection_prob) {
         if (n1.is_inhibitory()) {
@@ -121,10 +124,11 @@ void create_connections(ArrayList<Neuron> globe) {
         } else {
           n1.connect_to(n2, weight);
         }
-        //return; // you gotta delete this later
       }
     }
   }
+  println(max_dist);
+  println(min_dist);
 }
 
 void draw_connections(ArrayList<Neuron> globe) {
@@ -164,15 +168,10 @@ void draw() {
   lights();
   draw_sphere(globe);
   draw_connections(globe);
+  int num_spikes = 0;
   
   for (int i = 0; i < globe.size(); i++) {
-    //PFont f1;
-    //f1 = createFont("Arial",16,true);
-    //textFont(f1,100); 
-    //fill(255);
     Neuron current_neuron =  globe.get(i);
-    //PVector neuron_location = current_neuron.get_location();
-    //text(Integer.toString(i + 1), neuron_location.x , neuron_location.y, neuron_location.z);
     
     current_neuron.update(time);
     ArrayList<PVector> current_neuron_spike_locations = current_neuron.spike_locations;
@@ -181,21 +180,18 @@ void draw() {
       is_inhibitory = true;
     }
     draw_spike_locations(current_neuron_spike_locations, is_inhibitory);
+    
+    ArrayList<Signal> current_neuron_output_signals = current_neuron.get_output_signals();
+    for (int j = 0; j < current_neuron_output_signals.size(); j++) {
+      Signal current_signal = current_neuron_output_signals.get(j);
+      if (current_signal.is_spiking()) {
+        num_spikes = num_spikes + 1;
+      }
+    }
   }
-  
+  num_spikes_list.add(num_spikes);
 }
 
 void mousePressed() {
-  
-  //Neuron n1 = globe.get(0);
-  //Neuron n2 = globe.get(1);
-  //Neuron n3 = globe.get(2);
-
-  ////n1.spike();
-  
-  ////n1.update_membrane_potential(weight);
-  //println(n1.V);
-  //println(n2.V);
-  //println(n3.V);
-  //println("---------");
+  //println(num_spikes_list);
 }

@@ -1,13 +1,12 @@
 class Neuron {
   
   PVector location;
-  //ArrayList<Signal> input_signals = new ArrayList<Signal>();
   ArrayList<Signal> output_signals = new ArrayList<Signal>();
   float V_R = -0.875; // resting membrane potential
   float V = V_R; // current membrane potential
   float V_THETA = 0.60; // firing threshold potential
-  float TAU_V = 0.03; // decay parameter 0.05
-  float REFRACTORY_PERIOD_DURATION = 10; // refactory period time in ms 19 40
+  float TAU_V = 0.03; // decay parameter
+  float REFRACTORY_PERIOD_DURATION = 10; // refactory period time in ms
   boolean in_refractory_period = false;
   float current_time;
   float refractory_time_start;
@@ -44,6 +43,9 @@ class Neuron {
     return output_signals;
   }
   
+  Energy get_energy_pool() {
+    return energy_pool;
+  }
   
    void set_as_inhibitory() {
     is_inhibitory = true;
@@ -54,17 +56,15 @@ class Neuron {
       return true;
     } else {
       return false;
+    }
   }
-  }
-  
-  
   
   void decay_membrane_potential() {
     if (in_refractory_period) {
       return;
     }
-    //float tau_v = random(0.00005, 0.05);
-    V = V + TAU_V;
+    float tau_v = random(0.01, 0.05);
+    V = V + tau_v;
   }
   
   void reset_membrane_potential() {
@@ -76,9 +76,6 @@ class Neuron {
       return;
     }
     V = V + weight;
-    if (V >= V_THETA) {
-      //println(current_time);
-    }
   }
   
   void enter_refractory_period() {
@@ -88,7 +85,7 @@ class Neuron {
   
   void update(float time) {
     current_time = time;
-    energy_pool.replenish(current_time);
+    energy_pool.update(time);
     spike_locations = new ArrayList<PVector>();
     if (current_time > (refractory_time_start + REFRACTORY_PERIOD_DURATION)) {
         in_refractory_period = false;
