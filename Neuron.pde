@@ -1,5 +1,4 @@
 class Neuron {
-  
   PVector location;
   ArrayList<Signal> output_signals = new ArrayList<Signal>();
   float V_R = -0.875; // resting membrane potential

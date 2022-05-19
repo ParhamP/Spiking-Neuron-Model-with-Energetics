@@ -2,7 +2,7 @@ class Energy {
   Neuron source;
   float MIN_ENERGY = 0.0;
   float MAX_ENERGY = 1.0;
-  float fire_energy = 0.3; // the amount that depletes on firing 0.125
+  float fire_energy = 0.227; // the amount that depletes on firing
   float max_replenish_energy = 0.08;
   float min_replenish_energy = 0.02;
   float replenish_energy = 0.08; // the amount the energy pool replenishes
